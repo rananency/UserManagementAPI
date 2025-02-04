@@ -1,5 +1,5 @@
 const { messages, errorMessages } = require('../helpers/constant');
-const isValidObjectId = require('../helpers/utils');
+const {buildSearchQuery, isValidObjectId} = require('../helpers/utils');
 const User = require('../models/userModel');
 
 exports.createUser = async (req, res, next) => {
@@ -52,14 +52,60 @@ exports.deleteUser = async (req, res, next) => {
     }
 
     const user = await User.findByIdAndDelete(id);
+  
     if (!user) {
       console.log(errorMessages.USER_NOT_FOUND.replace("{userId}", id));
       return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace("{userId}", id) });
     }
+
     console.log( messages.OPERATION_SUCCESS.replace("{method}", 'deleted'));
     res.json({ message: messages.OPERATION_SUCCESS.replace("{method}", 'deleted')});
   } catch (err) {
     console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'delete')}${err.message}`);
+    next(err);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email, age } = req.body;
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+        return res.status(400).json({ message: errorMessages.invalidUserId });
+    }
+    
+    const user = await User.findByIdAndUpdate(id, { firstName, lastName, email, age }, { new: true });
+    
+    if (!user) {
+      console.log(errorMessages.USER_NOT_FOUND.replace("{userId}", id));
+      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace("{userId}", id) });
+    }
+    console.log( messages.OPERATION_SUCCESS.replace("{method}", 'updated'));
+    res.json({ message: messages.OPERATION_SUCCESS.replace("{method}", 'updated')});
+  } catch (err) {
+    console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'updating')}${err.message}`);
+    next(err);
+  }
+};
+
+exports.searchUsers = async (req, res, next) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+
+    if ((firstName && typeof firstName !== 'string') || 
+        (lastName && typeof lastName !== 'string') || 
+        (email && typeof email !== 'string')) {
+      return res.status(400).json({ message: 'Invalid input, expected strings' });
+    }
+
+    const query = buildSearchQuery({ firstName, lastName, email });
+
+    const users = await User.find(query);
+
+    res.json(users);
+  } catch (err) {
+    console.log(`Error searching users: ${err.message}`);
     next(err);
   }
 };
