@@ -1,100 +1,99 @@
-const { messages, errorMessages } = require('../helpers/constant');
-const {buildSearchQuery, isValidObjectId} = require('../helpers/utils');
-const User = require('../models/userModel');
+import { messages, errorMessages } from '../helpers/constant.js';
+import { buildSearchQuery, isValidObjectId } from '../helpers/utils.js';
+import User from '../models/userModel.js';
 
-exports.createUser = async (req, res, next) => {
+ const createUser = async (req, res, next) => {
   try {
     const { firstName, lastName, email, age } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: errorMessages.emailExist });
+      return res.status(400).json({ message: errorMessages.EMAIL_EXIST });
     }
     const user = await User.create({ firstName, lastName, email, age });
 
-    console.log( messages.OPERATION_SUCCESS.replace("{method}", 'created'));
+    console.log(messages.OPERATION_SUCCESS.replace('{method}', 'created'));
     res.status(201).json({
-        message: `user created successfully with ID ${user._id}`,
-        userId: user._id,
-        email: user.email
+      message: `user created successfully with ID ${user._id}`,
+      userId: user._id,
+      email: user.email,
     });
   } catch (err) {
-    console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'creating')}${err.message}`);
+    console.log(`${errorMessages.OPERATION_FAILED.replace('{method}', 'creating')}${err.message}`);
     next(err);
   }
 };
 
-exports.getUser = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-
-        if (!isValidObjectId(id)) {
-            return res.status(400).json({ message: errorMessages.invalidUserId });
-        }
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace("{userId}", id) });
-      }
-      console.log( messages.OPERATION_SUCCESS.replace("{method}", 'fetched'));
-      res.json(user);
-    } catch (err) {
-      console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'retriving')}${err.message}`);
-      next(err);
-    }
-};
-
-
-exports.deleteUser = async (req, res, next) => {
+ const getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {
-        return res.status(400).json({ message: errorMessages.invalidUserId });
+      return res.status(400).json({ message: errorMessages.INVALID_USER_ID });
     }
-
-    const user = await User.findByIdAndDelete(id);
-  
+    const user = await User.findById(id);
     if (!user) {
-      console.log(errorMessages.USER_NOT_FOUND.replace("{userId}", id));
-      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace("{userId}", id) });
+      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace('{userId}', id) });
     }
-
-    console.log( messages.OPERATION_SUCCESS.replace("{method}", 'deleted'));
-    res.json({ message: messages.OPERATION_SUCCESS.replace("{method}", 'deleted')});
+    console.log(messages.OPERATION_SUCCESS.replace('{method}', 'fetched'));
+    res.json(user);
   } catch (err) {
-    console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'delete')}${err.message}`);
+    console.log(`${errorMessages.OPERATION_FAILED.replace('{method}', 'retrieving')}${err.message}`);
     next(err);
   }
 };
 
-exports.updateUser = async (req, res, next) => {
+ const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: errorMessages.INVALID_USER_ID });
+    }
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      console.log(errorMessages.USER_NOT_FOUND.replace('{userId}', id));
+      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace('{userId}', id) });
+    }
+
+    console.log(messages.OPERATION_SUCCESS.replace('{method}', 'deleted'));
+    res.json({ message: messages.OPERATION_SUCCESS.replace('{method}', 'deleted') });
+  } catch (err) {
+    console.log(`${errorMessages.OPERATION_FAILED.replace('{method}', 'delete')}${err.message}`);
+    next(err);
+  }
+};
+
+ const updateUser = async (req, res, next) => {
   try {
     const { firstName, lastName, email, age } = req.body;
     const { id } = req.params;
 
     if (!isValidObjectId(id)) {
-        return res.status(400).json({ message: errorMessages.invalidUserId });
+      return res.status(400).json({ message: errorMessages.INVALID_USER_ID });
     }
-    
+
     const user = await User.findByIdAndUpdate(id, { firstName, lastName, email, age }, { new: true });
-    
+
     if (!user) {
-      console.log(errorMessages.USER_NOT_FOUND.replace("{userId}", id));
-      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace("{userId}", id) });
+      console.log(errorMessages.USER_NOT_FOUND.replace('{userId}', id));
+      return res.status(404).json({ message: errorMessages.USER_NOT_FOUND.replace('{userId}', id) });
     }
-    console.log( messages.OPERATION_SUCCESS.replace("{method}", 'updated'));
-    res.json({ message: messages.OPERATION_SUCCESS.replace("{method}", 'updated')});
+    console.log(messages.OPERATION_SUCCESS.replace('{method}', 'updated'));
+    res.json({ message: messages.OPERATION_SUCCESS.replace('{method}', 'updated') });
   } catch (err) {
-    console.log(`${errorMessages.OPERATION_FAILED.replace("{method}", 'updating')}${err.message}`);
+    console.log(`${errorMessages.OPERATION_FAILED.replace('{method}', 'updating')}${err.message}`);
     next(err);
   }
 };
 
-exports.searchUsers = async (req, res, next) => {
+ const searchUsers = async (req, res, next) => {
   try {
     const { firstName, lastName, email } = req.body;
 
-    if ((firstName && typeof firstName !== 'string') || 
-        (lastName && typeof lastName !== 'string') || 
+    if ((firstName && typeof firstName !== 'string') ||
+        (lastName && typeof lastName !== 'string') ||
         (email && typeof email !== 'string')) {
       return res.status(400).json({ message: 'Invalid input, expected strings' });
     }
@@ -109,3 +108,5 @@ exports.searchUsers = async (req, res, next) => {
     next(err);
   }
 };
+
+export default {createUser,getUser,deleteUser,updateUser,searchUsers}

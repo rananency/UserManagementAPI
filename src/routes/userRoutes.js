@@ -1,13 +1,13 @@
-const express = require('express');
-const { createUser, getUser, deleteUser, updateUser, searchUsers } = require('../controllers/userController');
-const validateRequest = require('../middlewares/validateUserRequest');
+import express from 'express';
+import controller from '../controllers/userController.js';
+import validateRequest from '../middlewares/validateUserRequest.js';
 
 const router = express.Router();
 
-router.post('/', validateRequest, createUser);
-router.get('/:id', getUser);
-router.delete('/:id', deleteUser);
-router.put('/:id', validateRequest, updateUser);
-router.post('/search', searchUsers);
+router.post('/', validateRequest, controller.createUser);
+router.get('/:id', controller.getUser);
+router.delete('/:id', controller.deleteUser);
+router.put('/:id', validateRequest, controller.updateUser);
+router.post('/search', controller.searchUsers);
 
-module.exports = router;
+export default router;

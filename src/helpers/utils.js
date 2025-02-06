@@ -1,27 +1,31 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 /**
  * Checks if the given ID is a valid MongoDB ObjectId.
  * @param {string} id - The ID to validate.
  * @returns {boolean} - Returns true if valid, false otherwise.
  */
-exports.isValidObjectId = (id) => {
+export const isValidObjectId = (id) => {
   return mongoose.Types.ObjectId.isValid(id);
 };
 
 /**
- * @typedef {object} Response
- * @property {ServiceResponse} serviceResponse ServiceResponse
+ * @typedef {Object} Response
+ * @property {string} [email] - The exact email match if provided.
+ * @property {string} [firstName] - A case-insensitive regex search for the first name.
+ * @property {string} [lastName] - A case-insensitive regex search for the last name.
  */
 
 /**
- * Builds a MongoDB search query based on user input.
- * @param {string} firstName - First name of the user.
- * @param {string} lastName - Last name of the user.
- * @param {string} email - Email of the user.
- * @returns {Response} - MongoDB query object.
+ * Builds a MongoDB search query based on the provided user details.
+ * @param {Object} params - The search parameters.
+ * @param {string} [params.firstName] - First name of the user (optional).
+ * @param {string} [params.lastName] - Last name of the user (optional).
+ * @param {string} [params.email] - Email of the user (optional).
+ * @returns {Response} - The MongoDB query object with the appropriate search criteria.
  */
-exports.buildSearchQuery = ({ firstName, lastName, email }) => {
+
+export const buildSearchQuery = ({ firstName, lastName, email }) => {
   const query = {};
 
   if (email) {
@@ -39,3 +43,4 @@ exports.buildSearchQuery = ({ firstName, lastName, email }) => {
 
   return query;
 };
+

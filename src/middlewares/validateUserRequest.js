@@ -1,4 +1,4 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 const schema = Joi.object({
   firstName: Joi.string().pattern(/^[A-Za-z]+$/).required().messages({
@@ -15,7 +15,7 @@ const schema = Joi.object({
   }),
 });
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   const { error } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
