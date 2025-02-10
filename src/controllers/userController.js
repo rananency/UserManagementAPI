@@ -2,8 +2,8 @@ import { messages, errorMessages } from '../helpers/constant.js';
 import { buildSearchQuery, isValidObjectId } from '../helpers/utils.js';
 import User from '../models/userModel.js';
 
- const createUser = async (req, res, next) => {
-  try {
+ export const createUser = async (req, res, next) => {
+   try {
     const { firstName, lastName, email, age } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -23,7 +23,7 @@ import User from '../models/userModel.js';
   }
 };
 
- const getUser = async (req, res, next) => {
+ export const getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -42,7 +42,7 @@ import User from '../models/userModel.js';
   }
 };
 
- const deleteUser = async (req, res, next) => {
+ export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -65,7 +65,7 @@ import User from '../models/userModel.js';
   }
 };
 
- const updateUser = async (req, res, next) => {
+ export const updateUser = async (req, res, next) => {
   try {
     const { firstName, lastName, email, age } = req.body;
     const { id } = req.params;
@@ -88,7 +88,7 @@ import User from '../models/userModel.js';
   }
 };
 
- const searchUsers = async (req, res, next) => {
+ export const searchUsers = async (req, res, next) => {
   try {
     const { firstName, lastName, email } = req.body;
 
@@ -108,5 +108,3 @@ import User from '../models/userModel.js';
     next(err);
   }
 };
-
-export default {createUser,getUser,deleteUser,updateUser,searchUsers}

@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { expect } from 'chai';
 import User from '../src/models/userModel.js';
 import {errorMessages} from '../src/helpers/constant.js';
-import controller from '../src/controllers/userController.js';
+import { createUser } from '../src/controllers/userController.js';
 
 chai.use(chaiHttp);
 
@@ -29,7 +29,7 @@ describe('User Controller - createUser', () => {
     sinon.stub(User, 'findOne').resolves(null);
     sinon.stub(User, 'create').resolves({ _id: '12345', email: req.body.email });
 
-    await controller.createUser(req, res, next);
+    await createUser(req, res, next);
 
     expect(res.status.calledWith(201)).to.be.true;
     expect(res.json.calledWith({
@@ -42,7 +42,7 @@ describe('User Controller - createUser', () => {
   it('should return 400 if email already exists', async () => {
     sinon.stub(User, 'findOne').resolves({ email: req.body.email });
 
-    await controller.createUser(req, res, next);
+    await createUser(req, res, next);
 
     expect(res.status.calledWith(400)).to.be.true;
     expect(res.json.calledWith({ message: errorMessages.EMAIL_EXIST })).to.be.true;
@@ -52,7 +52,7 @@ describe('User Controller - createUser', () => {
     const error = new Error('Database error');
     sinon.stub(User, 'findOne').throws(error);
 
-    await controller.createUser(req, res, next);
+    await createUser(req, res, next);
 
     expect(next.calledWith(error)).to.be.true;
   });
